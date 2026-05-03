@@ -1,0 +1,173 @@
+-- AIM LOCK BY ZASS STORE - PRECISE WHITE CHAMS (THICK OUTLINE) 😈
+local Player = game.Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+-- KONFIGURASI X 😈
+local _SETTINGS = {
+    Enabled = false,
+    FovSize = 250,
+    TiltVertical = 0,
+    Minimized = false,
+    ChamsEnabled = false, -- ESP CHAMS 😈
+    EspNames = false,
+    EspLines = false
+}
+
+-- UI BASE 😈
+local ScreenGui = Instance.new("ScreenGui", Player:WaitForChild("PlayerGui"))
+ScreenGui.Name = "AIM_LOCK_BY_ZASS_STORE_😈"
+ScreenGui.ResetOnSpawn = false
+
+-- WATERMARK 😈
+local ExternalWatermark = Instance.new("TextLabel", ScreenGui)
+ExternalWatermark.Size = UDim2.new(0, 200, 0, 30)
+ExternalWatermark.Position = UDim2.new(0.5, -100, 0, 20)
+ExternalWatermark.Text = "MADE BY ZAS STORE 😈"
+ExternalWatermark.BackgroundTransparency = 1
+ExternalWatermark.Font = Enum.Font.GothamBold
+ExternalWatermark.TextSize = 18
+ExternalWatermark.ZIndex = 10
+RunService.RenderStepped:Connect(function()
+    ExternalWatermark.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+end)
+
+-- MAIN HUB FRAME 😈
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 220, 0, 320)
+Main.Position = UDim2.new(0.02, 0, 0.3, 0)
+Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Main.BorderSizePixel = 0
+Main.Active = true
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+
+-- SISTEM DRAG (GERAKKAN KE MANA SAJA) 😈
+local dragToggle, dragInput, dragStart, startPos
+Main.InputBegan:Connect(function(input)
+    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+        dragToggle = true; dragStart = input.Position; startPos = Main.Position
+        input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragToggle = false end end)
+    end
+end)
+Main.InputChanged:Connect(function(input) if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then dragInput = input end end)
+UserInputService.InputChanged:Connect(function(input)
+    if (input == dragInput and dragToggle) then
+        local delta = input.Position - dragStart
+        Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- HEADER & MINIMIZE 😈
+local Header = Instance.new("Frame", Main)
+Header.Size = UDim2.new(1, 0, 0, 35)
+Header.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Instance.new("UICorner", Header)
+
+local Title = Instance.new("TextLabel", Header)
+Title.Text = "AIM LOCK BY ZASS STORE 😈"
+Title.Size = UDim2.new(0.8, 0, 1, 0); Title.Position = UDim2.new(0.05, 0, 0, 0); Title.TextColor3 = Color3.fromRGB(255, 255, 255); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left; Title.TextSize = 12
+
+local MiniBtn = Instance.new("TextButton", Header)
+MiniBtn.Size = UDim2.new(0, 30, 0, 30); MiniBtn.Position = UDim2.new(1, -32, 0.5, -15); MiniBtn.Text = "-"; MiniBtn.BackgroundTransparency = 1; MiniBtn.TextColor3 = Color3.fromRGB(255, 255, 255); MiniBtn.TextSize = 20
+
+-- AIM ASSIST BUTTON 😈
+local AimBtn = Instance.new("TextButton", Main)
+AimBtn.Size = UDim2.new(0.95, 0, 0, 35); AimBtn.Position = UDim2.new(0.025, 0, 0, 40); AimBtn.BackgroundColor3 = Color3.fromRGB(80, 0, 0); AimBtn.Text = "AIM ASSIST: OFF 😈"; AimBtn.TextColor3 = Color3.fromRGB(255, 255, 255); AimBtn.Font = Enum.Font.GothamBold; AimBtn.TextSize = 12; AimBtn.ZIndex = 20; Instance.new("UICorner", AimBtn).CornerRadius = UDim.new(0, 4)
+
+local ContentFrame = Instance.new("ScrollingFrame", Main)
+ContentFrame.Size = UDim2.new(1, -10, 1, -85); ContentFrame.Position = UDim2.new(0, 5, 0, 80); ContentFrame.BackgroundTransparency = 1; ContentFrame.ScrollBarThickness = 2; ContentFrame.CanvasSize = UDim2.new(0, 0, 0, 320)
+Instance.new("UIListLayout", ContentFrame).Padding = UDim.new(0, 5)
+
+-- LOGIC BUTTONS 😈
+AimBtn.MouseButton1Click:Connect(function()
+    _SETTINGS.Enabled = not _SETTINGS.Enabled
+    AimBtn.Text = "AIM ASSIST: " .. (_SETTINGS.Enabled and "ON 😈" or "OFF 😈")
+    AimBtn.BackgroundColor3 = _SETTINGS.Enabled and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(80, 0, 0)
+end)
+
+MiniBtn.MouseButton1Click:Connect(function()
+    _SETTINGS.Minimized = not _SETTINGS.Minimized
+    if _SETTINGS.Minimized then
+        Main:TweenSize(UDim2.new(0, 220, 0, 80), "Out", "Quad", 0.3, true); ContentFrame.Visible = false; MiniBtn.Text = "+"
+    else
+        Main:TweenSize(UDim2.new(0, 220, 0, 320), "Out", "Quad", 0.3, true); ContentFrame.Visible = true; MiniBtn.Text = "-"
+    end
+end)
+
+local function CreateToggle(txt, setting)
+    local Btn = Instance.new("TextButton", ContentFrame)
+    Btn.Size = UDim2.new(0.95, 0, 0, 35); Btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Btn.Text = txt .. ": OFF 😈"; Btn.TextColor3 = Color3.fromRGB(200, 200, 200); Btn.Font = Enum.Font.GothamBold; Btn.TextSize = 11; Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 4)
+    Btn.MouseButton1Click:Connect(function()
+        _SETTINGS[setting] = not _SETTINGS[setting]
+        Btn.Text = txt .. ": " .. (_SETTINGS[setting] and "ON 😈" or "OFF 😈")
+        Btn.BackgroundColor3 = _SETTINGS[setting] and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(30, 30, 30)
+        Btn.TextColor3 = _SETTINGS[setting] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+    end)
+end
+
+CreateToggle("ESP WHITE CHAMS", "ChamsEnabled")
+CreateToggle("ESP LINE", "EspLines")
+CreateToggle("ESP NAMES", "EspNames")
+
+-- V-TILT 😈
+local TiltFrame = Instance.new("Frame", ContentFrame); TiltFrame.Size = UDim2.new(0.95, 0, 0, 65); TiltFrame.BackgroundTransparency = 1
+local Label = Instance.new("TextLabel", TiltFrame); Label.Size = UDim2.new(1, 0, 0, 25); Label.Text = "V-TILT DEGREE: 0° 😈"; Label.TextColor3 = Color3.fromRGB(0, 255, 255); Label.Font = Enum.Font.GothamBold; Label.BackgroundTransparency = 1
+local PBtn = Instance.new("TextButton", TiltFrame); PBtn.Size = UDim2.new(0.48, 0, 0, 30); PBtn.Position = UDim2.new(0, 0, 0, 30); PBtn.Text = "+ 😈"; PBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); PBtn.TextColor3 = Color3.fromRGB(255, 255, 255); Instance.new("UICorner", PBtn)
+local MBtn = Instance.new("TextButton", TiltFrame); MBtn.Size = UDim2.new(0.48, 0, 0, 30); MBtn.Position = UDim2.new(0.52, 0, 0, 30); MBtn.Text = "- 😈"; MBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); MBtn.TextColor3 = Color3.fromRGB(255, 255, 255); Instance.new("UICorner", MBtn)
+PBtn.MouseButton1Click:Connect(function() _SETTINGS.TiltVertical = _SETTINGS.TiltVertical + 1; Label.Text = "V-TILT DEGREE: " .. _SETTINGS.TiltVertical .. "° 😈" end)
+MBtn.MouseButton1Click:Connect(function() _SETTINGS.TiltVertical = _SETTINGS.TiltVertical - 1; Label.Text = "V-TILT DEGREE: " .. _SETTINGS.TiltVertical .. "° 😈" end)
+
+-- SISTEM CHAMS (OUTLINE TEBAL + 15% FILL) 😈
+local function CreateVisuals(plr)
+    local Highlight = Instance.new("Highlight")
+    Highlight.Name = "X_Premium_Chams"
+    Highlight.FillColor = Color3.fromRGB(255, 255, 255)
+    Highlight.FillTransparency = 0.85 
+    Highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+    Highlight.OutlineTransparency = 0 
+    Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    Highlight.Enabled = false
+
+    local Tracer = Drawing.new("Line"); Tracer.Visible = false; Tracer.Color = Color3.fromRGB(255, 255, 255); Tracer.Thickness = 1.5
+    local Name = Drawing.new("Text"); Name.Visible = false; Name.Color = Color3.fromRGB(255, 255, 255); Name.Size = 14; Name.Center = true; Name.Outline = true
+
+    RunService.RenderStepped:Connect(function()
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr ~= Player and plr.Character.Humanoid.Health > 0 then
+            local hrp = plr.Character.HumanoidRootPart
+            local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+            
+            if _SETTINGS.ChamsEnabled then
+                Highlight.Parent = plr.Character
+                Highlight.Enabled = true
+            else
+                Highlight.Enabled = false
+            end
+
+            if onScreen then
+                Tracer.Visible = _SETTINGS.EspLines; Tracer.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y); Tracer.To = Vector2.new(pos.X, pos.Y)
+                Name.Visible = _SETTINGS.EspNames; Name.Position = Vector2.new(pos.X, pos.Y - 45); Name.Text = plr.Name
+            else Tracer.Visible = false; Name.Visible = false end
+        else Highlight.Enabled = false; Tracer.Visible = false; Name.Visible = false end
+    end)
+end
+
+for _, v in pairs(game.Players:GetPlayers()) do if v ~= Player then CreateVisuals(v) end end
+game.Players.PlayerAdded:Connect(function(v) CreateVisuals(v) end)
+
+-- AIM LOCK SYSTEM 😈
+RunService.RenderStepped:Connect(function()
+    if _SETTINGS.Enabled then
+        local target = nil; local dist = _SETTINGS.FovSize
+        for _, v in pairs(game.Players:GetPlayers()) do
+            if v ~= Player and v.Character and v.Character:FindFirstChild("Head") and v.Character.Humanoid.Health > 0 then
+                local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
+                if onScreen then
+                    local d = (Vector2.new(pos.X, pos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                    if d < dist then dist = d; target = v.Character end
+                end
+            end
+        end
+        if target then Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Head.Position) * CFrame.Angles(math.rad(_SETTINGS.TiltVertical), 0, 0) end
+    end
+end)
